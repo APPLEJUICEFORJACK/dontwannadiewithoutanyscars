@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Alma Mater Mint: Revenue Simulator</title>
+    <!-- Load Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Basic Reset & Font */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f7f6;
+            color: #333;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Container */
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        /* Headings */
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #c0392b; /* A slightly provocative red */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+
+        /* Input Sections */
+        .input-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #fdfdfd;
+            border: 1px solid #eee;
+            border-radius: 5px;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        /* Validation & Totals */
+        .validation-message {
+            font-weight: bold;
+            padding: 8px;
+            margin-top: 15px;
+            border-radius: 4px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .valid {
+            color: #27ae60;
+            background-color: #eafaf1;
+        }
+
+        .invalid {
+            color: #c0392b;
+            background-color: #fbeeee; /* Fixed potential typo fbeee -> #fbeeee or similar */
+
+        }
+                /* --- Styles for NEW Sections --- */
+
+        /* Profit Estimate Section */
+        .profit-estimate-section {
+            margin-top: 30px;
+            padding: 20px 25px;
+            background-color: #e8f6f3; /* Light teal background */
+            border: 1px solid #a2d9ce;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .profit-estimate-section h3 {
+            color: #138d75; /* Darker teal */
+            margin-bottom: 8px;
+            border-bottom: none; /* Remove default border */
+        }
+
+        .profit-note {
+            font-size: 0.9em;
+            font-style: italic;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        /* Use existing result-item style but customize value color */
+         .profit-estimate-section .result-item {
+             border-bottom: none; /* No border needed for single item */
+             justify-content: center; /* Center the label and value */
+             gap: 15px; /* Add some space between label and value */
+              text-align: center;
+         }
+         .profit-estimate-section .result-label {
+            text-align: right;
+         }
+
+        .profit-estimate-section .result-value {
+            color: #16a085; /* Match heading teal */
+            font-size: 1.6em; /* Make it prominent */
+             text-align: left;
+        }
+
+
+        /* Critical Perspective Section */
+        .critical-perspective {
+            margin-top: 40px;
+            padding: 25px;
+            background-color: #fcf3cf; /* Light yellow, caution tone */
+            border-left: 6px solid #f1c40f; /* Yellow accent border */
+            border-radius: 5px;
+             box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        }
+
+        .critical-perspective h3 {
+            color: #d35400; /* Contrasting orange/brown */
+            text-align: left; /* Align heading left */
+            margin-bottom: 15px;
+             border-bottom: 1px solid #fdebd0; /* Light separator */
+             padding-bottom: 8px;
+             font-size: 1.5em;
+        }
+
+        .critical-perspective p {
+            margin-bottom: 15px;
+            line-height: 1.7;
+            color: #505050; /* Dark grey for readability */
+             text-align: justify; /* Justify text for block feel */
+        }
+         .critical-perspective p:last-of-type {
+            margin-bottom: 0; /* No margin on last paragraph */
+        }
+
+        .critical-perspective strong {
+            color: #c0392b; /* Highlight key numbers in red */
+             font-weight: 600;
+        }
+         /* --- End of Styles for NEW Sections --- */
+
+         /* Minor adjustment for spacing */
+         .chart-container {
+            margin-top: 40px; /* Ensure consistent spacing */
+         }
+
+        /* Results Section */
+        .results-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            color: #ecf0f1;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            text-align: center; /* Center align text within results */
+        }
+
+        .results-section h2 {
+            color: #ecf0f1;
+            border-bottom: 2px solid #566573;
+             margin-bottom: 20px; /* Add space below heading */
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0; /* Reduced padding slightly */
+            border-bottom: 1px solid #566573;
+            font-size: 1.1em;
+             text-align: left; /* Keep item text left aligned */
+        }
+        /* Removed :last-of-type border removal, ensure all items have border */
+        /* .result-item:last-of-type { border-bottom: none; } */
+
+
+        .result-label {
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-weight: bold;
+            font-size: 1.3em;
+            color: #f1c40f; /* Gold color for money */
+            transition: transform 0.3s ease;
+            min-width: 150px; /* Ensure space for numbers */
+            text-align: right;
+        }
+
+        .total-revenue .result-value {
+            font-size: 1.8em;
+            color: #2ecc71; /* Bright green for the grand total */
+            transform-origin: right center;
+        }
+
+         /* Style for the total revenue in words */
+        .revenue-in-words {
+            font-size: 1.1em;
+            font-style: italic;
+            color: #bdc3c7; /* Lighter grey */
+            margin-top: 15px; /* Space above */
+             padding-top: 15px; /* Space above */
+             border-top: 1px solid #566573; /* Separator line */
+             text-align: center; /* Center the words */
+        }
+
+        /* Animation for result values */
+        @keyframes count-up {
+             from { opacity: 0; transform: translateY(10px); }
+             to { opacity: 1; transform: translateY(0); }
+        }
+        .result-value {
+             animation: count-up 0.5s ease-out forwards;
+        }
+
+        /* Chart Container Styling */
+        .chart-container {
+            position: relative;
+            margin: 40px auto; /* Center the chart container */
+            height: 45vh;      /* Adjust height as needed */
+            width: 95%;       /* Make width relative to container */
+            max-width: 800px; /* Keep a max width */
+            background-color: #fff; /* Add a background */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        /* Bizarre Facts Section */
+        .bizarre-facts {
+            margin-top: 40px;
+            padding: 25px;
+            background-color: #fdfafa; /* Slightly different background */
+            border: 1px dashed #e74c3c; /* Dashed border */
+            border-radius: 8px;
+        }
+
+        .bizarre-facts h3 {
+            color: #c0392b; /* Match title red */
+            margin-bottom: 20px;
+             text-align: center;
+             font-size: 1.5em;
+        }
+
+        .bizarre-facts ul {
+            list-style: none; /* Remove default bullets */
+            padding-left: 0;
+        }
+
+        .bizarre-facts li {
+            background-color: #fff;
+            border-left: 5px solid #e74c3c; /* Accent line */
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            font-size: 1em;
+            color: #555;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease-in-out;
+        }
+        .bizarre-facts li:hover {
+            transform: translateX(5px); /* Subtle hover effect */
+        }
+
+        /* Footer/Notes */
+        .notes {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+            text-align: center;
+        }
+
+        .notes p {
+            margin-bottom: 5px;
+        }
+
+        /* Final Remark Styling */
+        .final-remark {
+            margin-top: 40px;
+            padding: 15px;
+            text-align: center;
+            font-style: italic;
+            color: #7f8c8d; /* Muted grey */
+            font-size: 1.1em;
+            border-top: 1px dashed #bdc3c7;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>The Alma Mater Mint: Revenue Simulator</h1>
+
+    <div class="container">
+
+        <!-- Global Settings -->
+        <div class="input-section">
+            <h3>Global Settings</h3>
+            <div class="input-group">
+                <label for="totalStudents">Total Student Population:</label>
+                <input type="number" id="totalStudents" value="13000" min="0">
+            </div>
+        </div>
+
+        <!-- Tuition Fees Section -->
+        <div class="input-section">
+            <h2>1. Tuition Fee Distribution</h2>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="cat1Students">Category 1 Students (₹1,98,000/yr):</label>
+                    <input type="number" id="cat1Students" value="11850" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="cat2Students">Category 2 Students (₹2,98,000/yr):</label>
+                    <input type="number" id="cat2Students" value="750" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="cat3Students">Category 3 Students (₹3,98,000/yr):</label>
+                    <input type="number" id="cat3Students" value="300" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="cat45Students">Category 4/5 Students (₹4,98,000/yr):</label>
+                    <input type="number" id="cat45Students" value="100" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="dayScholars">Day Scholars (Pay Tuition Only):</label>
+                    <input type="number" id="dayScholars" value="1000" min="0">
+                </div>
+            </div>
+             <div id="tuitionValidation" class="validation-message"></div>
+        </div>
+
+        <!-- Hostel & Mess Fees Section -->
+        <div class="input-section">
+            <h2>2. Hostel & Mess Fee Distribution (for Residents)</h2>
+            <p style="text-align: center; margin-bottom: 15px; font-style: italic;">Distribute the <strong id="hostelResidentsCount">12000</strong> hostel residents below:</p>
+            <div class="input-grid">
+                 <div class="input-group">
+                    <label for="room2AC">2 Bed AC (₹1,94,990):</label>
+                    <input type="number" id="room2AC" value="1000" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="room2NonAC">2 Bed Non-AC (₹1,67,530):</label>
+                    <input type="number" id="room2NonAC" value="1500" min="0">
+                </div>
+                 <div class="input-group">
+                    <label for="room3AC">3 Bed AC (₹1,81,530):</label>
+                    <input type="number" id="room3AC" value="1500" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="room3NonAC">3 Bed Non-AC (₹1,53,170):</label>
+                    <input type="number" id="room3NonAC" value="4000" min="0"> <!-- Defaulting to user's popular option -->
+                </div>
+                 <div class="input-group">
+                    <label for="room4BunkerAC">4 Bed Bunker AC (₹1,64,250):</label>
+                    <input type="number" id="room4BunkerAC" value="1000" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="room4BunkerNonAC">4 Bed Bunker Non-AC (₹1,29,740):</label>
+                    <input type="number" id="room4BunkerNonAC" value="1500" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="room4FlatAC">4 Bed Flat AC (₹1,67,340):</label>
+                    <input type="number" id="room4FlatAC" value="500" min="0">
+                </div>
+                 <div class="input-group">
+                    <label for="room4FlatNonAC">4 Bed Flat Non-AC (₹1,32,830):</label>
+                    <input type="number" id="room4FlatNonAC" value="1000" min="0">
+                </div>
+            </div>
+             <div id="hostelValidation" class="validation-message"></div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section">
+            <h2>Estimated Annual Revenue</h2>
+            <div class="result-item">
+                <span class="result-label">Total Tuition Revenue:</span>
+                <span class="result-value" id="totalTuitionRevenue">₹0</span>
+            </div>
+             <div class="result-item">
+                <span class="result-label">Total Hostel & Mess Revenue:</span>
+                <span class="result-value" id="totalHostelRevenue">₹0</span>
+            </div>
+             <div class="result-item total-revenue">
+                <span class="result-label">Combined Grand Total:</span>
+                <span class="result-value" id="grandTotalRevenue">₹0</span>
+            </div>
+             <!-- Revenue in Words Display -->
+            <div class="revenue-in-words" id="grandTotalWords">Zero Rupees</div>
+        </div>
+        <div class="profit-estimate-section">
+            <h3>Overly Generous Profit Estimate</h3>
+            <p class="profit-note">(Assuming 2/3rds Covers ALL Costs/Investments/Taxes - A Simplified View)</p>
+            <div class="result-item simple-profit">
+                 <span class="result-label">Estimated Profit (Revenue / 3):</span>
+                 <span class="result-value" id="generousProfitValue">₹0</span>
+            </div>
+        </div>
+
+        <!-- NEW: Critical Perspective Section -->
+        <div class="critical-perspective">
+            <h3>A Critical Perspective on Resource Allocation</h3>
+            <p>
+                Our institution potentially generates revenue exceeding <strong>₹400 crores</strong> annually (as simulated above), yet we, the students, often experience bare minimum facilities. After investing nearly <strong>₹15,00,000</strong> each for our degrees, persistent issues like electricity cuts, water shortages, and arguably oppressive restrictions remain commonplace—conditions that wouldn't be acceptable elsewhere.
+            </p>
+            <p>
+                Meanwhile, reports suggest faculty members (approx. 500+ employees) receive an average compensation around <strong>₹1.5 to 2 lakhs per year</strong>, while essential staff like security guards and cleaners might receive significantly less, perhaps barely one-tenth of that figure.
+            </p>
+             <p>
+                Even if we were to *extremely generously* allocate <strong>₹100 crores</strong> annually towards infrastructure development and maintenance (a figure that seems questionable given frequent utility disruptions – for instance, experiencing multiple power outages before mid-afternoon on any given day), it still leaves a substantial sum, potentially hundreds of crores, unaccounted for in terms of direct student benefit or transparent operational costs. This raises questions about financial priorities and where the generated revenue ultimately flows.
+            </p>
+        </div>
+
+
+        <!-- Revenue Comparison Chart -->
+        <div class="chart-container">
+            <canvas id="revenueComparisonChart"></canvas>
+        </div>
+
+         <!-- Bizarre Facts Section -->
+        <div class="bizarre-facts">
+            <h3>Revenue Reality Check: What Else Costs This Much?</h3>
+            <ul>
+                <li>That's roughly the cost to build **several** luxury apartment complexes.</li>
+                <li>This annual income could potentially buy **dozens** of private jets (depending on the model, of course).</li>
+                <li>Imagine paying the salaries of **thousands** of software engineers for a year with this.</li>
+                <li>It's more than the *entire* GDP of Tuvalu.</li>
+                <li>You could probably buy **every single student** a high-end laptop... and still have loads left over.</li>
+                <li>This could fund the construction and initial setup of **numerous** mid-sized hospitals.</li>
+                <li>Think of how many **lifetimes** of average Indian annual salaries this represents.</li>
+                <li>It's like collecting the toll from a **major national highway** for a significant period.</li>
+                <li>You could sponsor **hundreds** of full PhD scholarships at top global universities annually.</li>
+             </ul>
+        </div>
+
+
+        <!-- Notes -->
+        <div class="notes">
+             <p><strong>Disclaimer:</strong> This is a simulation based on provided estimates and the fee structure image.</p>
+             <p>Tuition fees beyond Category 1 are approximations (+₹1 Lakh per category).</p>
+             <p>Hostel fees are based on the 10-month fee structure provided.</p>
+             <p>Adjust the numbers above to see how the revenue changes!</p>
+             <p>Comparative facts are illustrative estimates and not precise financial equivalents.</p>
+        </div>
+
+        <!-- Final Remark -->
+        <p class="final-remark">
+            ...and after contributing to *this* mountain of revenue, consistent water supply on campus can still feel like a luxury item.
+        </p>
+
+    </div> <!-- End of .container -->
+
+    <script>
+        let comparisonChart = null;
+
+        // --- Fee Data ---
+        const tuitionFees = {
+            cat1: 198000, cat2: 298000, cat3: 398000, cat45: 498000, dayScholar: 0
+        };
+        const hostelMessFees = {
+            room2AC: 194990, room2NonAC: 167530, room3AC: 181530, room3NonAC: 153170,
+            room4BunkerAC: 164250, room4BunkerNonAC: 129740, room4FlatAC: 167340, room4FlatNonAC: 132830
+        };
+
+        // --- DOM Elements ---
+        const totalStudentsInput = document.getElementById('totalStudents');
+        const cat1Input = document.getElementById('cat1Students');
+        const cat2Input = document.getElementById('cat2Students');
+        const cat3Input = document.getElementById('cat3Students');
+        const cat45Input = document.getElementById('cat45Students');
+        const dayScholarsInput = document.getElementById('dayScholars');
+        const tuitionValidationMsg = document.getElementById('tuitionValidation');
+        const hostelResidentsCountEl = document.getElementById('hostelResidentsCount');
+        const roomInputs = {
+            room2AC: document.getElementById('room2AC'), room2NonAC: document.getElementById('room2NonAC'),
+            room3AC: document.getElementById('room3AC'), room3NonAC: document.getElementById('room3NonAC'),
+            room4BunkerAC: document.getElementById('room4BunkerAC'), room4BunkerNonAC: document.getElementById('room4BunkerNonAC'),
+            room4FlatAC: document.getElementById('room4FlatAC'), room4FlatNonAC: document.getElementById('room4FlatNonAC')
+        };
+        const hostelValidationMsg = document.getElementById('hostelValidation');
+        const totalTuitionRevenueEl = document.getElementById('totalTuitionRevenue');
+        const totalHostelRevenueEl = document.getElementById('totalHostelRevenue');
+        const grandTotalRevenueEl = document.getElementById('grandTotalRevenue');
+        const grandTotalWordsEl = document.getElementById('grandTotalWords');
+        // ***** FIX: Added the missing element reference *****
+        const generousProfitValueEl = document.getElementById('generousProfitValue');
+
+        // --- Helper Functions ---
+        function getValue(element) {
+             return parseInt(element.value, 10) || 0;
+        }
+        function formatCurrency(value) {
+            return value.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        }
+        function animateValue(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const currentValue = Math.floor(progress * (end - start) + start);
+                element.textContent = formatCurrency(currentValue);
+                if (progress < 1) { window.requestAnimationFrame(step); }
+                else { element.textContent = formatCurrency(end); }
+            };
+            window.requestAnimationFrame(step);
+        }
+         function updateDisplayValue(element, newValue) {
+             const currentText = element.textContent.replace(/[^0-9.-]+/g,"");
+             const startValue = parseInt(currentText, 10) || 0;
+             animateValue(element, startValue, newValue, 500);
+         }
+        // --- Number to Words (Indian System) ---
+        function numberToWordsIndian(num) {
+            const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
+            const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+            if (num === 0) return 'Zero Rupees';
+            let numBigInt;
+             try { numBigInt = BigInt(Math.floor(Number(num))); }
+             catch (e) { console.error("Could not convert number to BigInt:", num, e); return "Error converting number"; }
+             let numStr = numBigInt.toString();
+             const convert_nn = (nStr) => { let n = Number(nStr); if (isNaN(n) || n === 0) return ''; n = Math.floor(n); if (n < 20) return a[n]; return b[Math.floor(n / 10)] + a[n % 10]; };
+             const convert_nnn = (nStr) => { let n = Number(nStr); if (isNaN(n) || n === 0) return ''; n = Math.floor(n); let word = ''; if (n >= 100) { word += a[Math.floor(n / 100)] + 'Hundred '; n %= 100; } if (n > 0) { word += convert_nn(n.toString()); } return word; };
+             let words = ''; let len = numStr.length;
+             const handlePart = (divisorIndex, unitName) => { if (len > divisorIndex) { const partStr = numStr.slice(0, len - divisorIndex); const partNum = Number(partStr); if (partNum > 0) { if (unitName === 'Crore') { words += convert_nnn(partStr) + unitName + ' '; } else { words += convert_nn(partStr) + unitName + ' '; } } numStr = numStr.slice(len - divisorIndex); len = numStr.length; } };
+             handlePart(7, 'Crore'); handlePart(5, 'Lakh'); handlePart(3, 'Thousand');
+             if (Number(numStr) > 0) { words += convert_nnn(numStr); }
+             return words.replace(/\s+/g, ' ').trim() + ' Rupees';
+        }
+
+        // --- Calculation Logic ---
+        function calculateAndDisplayRevenue() {
+            const totalStudents = getValue(totalStudentsInput);
+            // --- Tuition Calculation ---
+            const cat1Count = getValue(cat1Input); const cat2Count = getValue(cat2Input);
+            const cat3Count = getValue(cat3Input); const cat45Count = getValue(cat45Input);
+            const dayScholarsCount = getValue(dayScholarsInput);
+            const totalTuitionAllocated = cat1Count + cat2Count + cat3Count + cat45Count + dayScholarsCount;
+            // --- Tuition Validation ---
+            if (totalTuitionAllocated === totalStudents) {
+                 tuitionValidationMsg.textContent = `✅ Student distribution matches total (${totalStudents.toLocaleString('en-IN')}).`;
+                 tuitionValidationMsg.className = 'validation-message valid';
+            } else {
+                 tuitionValidationMsg.textContent = `⚠️ Allocated ${totalTuitionAllocated.toLocaleString('en-IN')} students, but Total is ${totalStudents.toLocaleString('en-IN')}. Adjust values.`;
+                 tuitionValidationMsg.className = 'validation-message invalid';
+            }
+            let tuitionRevenue = 0;
+            tuitionRevenue += cat1Count * tuitionFees.cat1; tuitionRevenue += cat2Count * tuitionFees.cat2;
+            tuitionRevenue += cat3Count * tuitionFees.cat3; tuitionRevenue += cat45Count * tuitionFees.cat45;
+            updateDisplayValue(totalTuitionRevenueEl, tuitionRevenue);
+            // --- Hostel Calculation ---
+            const hostelResidentsTarget = totalStudents - dayScholarsCount;
+            hostelResidentsCountEl.textContent = hostelResidentsTarget.toLocaleString('en-IN');
+            let totalHostelAllocated = 0; let hostelRevenue = 0;
+            for (const roomKey in roomInputs) {
+                 const count = getValue(roomInputs[roomKey]); totalHostelAllocated += count;
+                 hostelRevenue += count * hostelMessFees[roomKey];
+            }
+             // --- Hostel Validation ---
+             if (hostelResidentsTarget < 0) {
+                  hostelValidationMsg.textContent = `⚠️ Cannot have negative hostel residents (${hostelResidentsTarget.toLocaleString('en-IN')}). Check Day Scholars count.`;
+                  hostelValidationMsg.className = 'validation-message invalid'; hostelRevenue = 0; totalHostelAllocated = 0;
+             } else if (totalHostelAllocated === hostelResidentsTarget) {
+                 hostelValidationMsg.textContent = `✅ Room distribution matches hostel residents (${hostelResidentsTarget.toLocaleString('en-IN')}).`;
+                 hostelValidationMsg.className = 'validation-message valid';
+             } else {
+                 hostelValidationMsg.textContent = `⚠️ Allocated ${totalHostelAllocated.toLocaleString('en-IN')} residents, but need to match ${hostelResidentsTarget.toLocaleString('en-IN')}. Adjust values.`;
+                 hostelValidationMsg.className = 'validation-message invalid';
+             }
+            hostelRevenue = Math.max(0, hostelRevenue);
+            updateDisplayValue(totalHostelRevenueEl, hostelRevenue);
+            // --- Grand Total ---
+            const grandTotal = tuitionRevenue + hostelRevenue;
+            updateDisplayValue(grandTotalRevenueEl, grandTotal);
+            // --- Update Grand Total in Words ---
+            grandTotalWordsEl.textContent = numberToWordsIndian(grandTotal);
+            // --- Calculate and Display Generous Profit Estimate ---
+             const generousProfit = Math.floor(grandTotal / 3);
+            // This line will now work because generousProfitValueEl is defined
+            updateDisplayValue(generousProfitValueEl, generousProfit);
+            // --- Update Comparison Chart ---
+            // This line will now be reached because the previous line doesn't error
+            updateComparisonChart(grandTotal);
+        }
+
+         // --- Update Comparison Chart ---
+         function updateComparisonChart(collegeRevenue) {
+             const ctx = document.getElementById('revenueComparisonChart').getContext('2d');
+             const accomplishments = {
+                 'Mangalyaan (Mars Orbiter)': 450 * 10000000, 'Chandrayaan-3 Mission': 615 * 10000000,
+                 'Statue of Unity Construction': 3000 * 10000000, 'Typical Major Bollywood Film': 500 * 10000000,
+                 
+             };
+             const chartLabels = ['Annual College Revenue', ...Object.keys(accomplishments)];
+             const chartData = [collegeRevenue, ...Object.values(accomplishments)];
+             const backgroundColors = ['#2ecc71', '#3498db', '#e74c3c', '#f1c40f', '#9b59b6', '#1abc9c'];
+             if (comparisonChart) { comparisonChart.destroy(); }
+             comparisonChart = new Chart(ctx, {
+                 type: 'bar',
+                 data: {
+                     labels: chartLabels,
+                     datasets: [{
+                         label: 'Estimated Cost (INR)', data: chartData, backgroundColor: backgroundColors,
+                         borderColor: backgroundColors.map(color => color.replace(/[^,]+(?=\))/, '0.8')), borderWidth: 1
+                     }]
+                 },
+                 options: {
+                     responsive: true, maintainAspectRatio: false,
+                     plugins: {
+                        title: { display: true, text: 'Annual Revenue vs. Major Project Costs (Illustrative)', font: { size: 16, weight: 'bold' }, padding: { top: 10, bottom: 20 } },
+                        tooltip: { callbacks: { label: function(context) { let label = context.dataset.label || ''; if (label) { label += ': '; } if (context.parsed.y !== null) { label += context.parsed.y.toLocaleString('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }); } return label; } } },
+                        legend: { display: false }
+                     },
+                     scales: {
+                         y: { beginAtZero: true, ticks: { callback: function(value, index, values) { return value.toLocaleString('en-IN', { style: 'currency', currency: 'INR', notation: 'compact', minimumFractionDigits: 0, maximumFractionDigits: 1 }); } }, title: { display: true, text: 'Cost (Indian Rupees)', font: { weight: 'bold' } } },
+                         x: { ticks: { /* Auto rotation */ } }
+                     }
+                 }
+             });
+         }
+
+        // --- Event Listeners ---
+        const allInputs = document.querySelectorAll('input[type="number"]');
+        allInputs.forEach(input => {
+             input.addEventListener('input', calculateAndDisplayRevenue);
+        });
+
+        // --- Initial Calculation on Load ---
+        document.addEventListener('DOMContentLoaded', calculateAndDisplayRevenue);
+
+    </script>
+
+</body>
+</html>
