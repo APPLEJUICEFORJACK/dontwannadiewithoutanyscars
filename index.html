@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Alma Mater Mint: Revenue Simulator</title>
-    <!-- Load Chart.js Library -->
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        /* Basic Reset & Font */
+        
         * {
             box-sizing: border-box;
             margin: 0;
@@ -26,7 +26,7 @@
             align-items: center;
         }
 
-        /* Container */
+        
         .container {
             max-width: 900px;
             width: 100%;
@@ -37,7 +37,7 @@
             margin-top: 20px;
         }
 
-        /* Headings */
+        
         h1, h2, h3 {
             color: #2c3e50;
             margin-bottom: 15px;
@@ -47,7 +47,7 @@
 
         h1 {
             font-size: 2.5em;
-            color: #c0392b; /* A slightly provocative red */
+            color: #c0392b; 
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
             margin-bottom: 30px;
         }
@@ -59,7 +59,7 @@
             margin-top: 30px;
         }
 
-        /* Input Sections */
+        
         .input-section {
             margin-bottom: 30px;
             padding: 20px;
@@ -98,7 +98,7 @@
             outline: none;
         }
 
-        /* Validation & Totals */
+        
         .validation-message {
             font-weight: bold;
             padding: 8px;
@@ -115,25 +115,25 @@
 
         .invalid {
             color: #c0392b;
-            background-color: #fbeeee; /* Fixed potential typo fbeee -> #fbeeee or similar */
+            background-color: #fbeeee; 
 
         }
-                /* --- Styles for NEW Sections --- */
+            
 
-        /* Profit Estimate Section */
+        
         .profit-estimate-section {
             margin-top: 30px;
             padding: 20px 25px;
-            background-color: #e8f6f3; /* Light teal background */
+            background-color: #e8f6f3; 
             border: 1px solid #a2d9ce;
             border-radius: 8px;
             text-align: center;
         }
 
         .profit-estimate-section h3 {
-            color: #138d75; /* Darker teal */
+            color: #138d75; 
             margin-bottom: 8px;
-            border-bottom: none; /* Remove default border */
+            border-bottom: none; 
         }
 
         .profit-note {
@@ -142,11 +142,11 @@
             color: #555;
             margin-bottom: 15px;
         }
-        /* Use existing result-item style but customize value color */
+        
          .profit-estimate-section .result-item {
-             border-bottom: none; /* No border needed for single item */
-             justify-content: center; /* Center the label and value */
-             gap: 15px; /* Add some space between label and value */
+             border-bottom: none; 
+             justify-content: center; 
+             gap: 15px; 
               text-align: center;
          }
          .profit-estimate-section .result-label {
@@ -154,27 +154,27 @@
          }
 
         .profit-estimate-section .result-value {
-            color: #16a085; /* Match heading teal */
-            font-size: 1.6em; /* Make it prominent */
+            color: #16a085;
+            font-size: 1.6em; 
              text-align: left;
         }
 
 
-        /* Critical Perspective Section */
+        
         .critical-perspective {
             margin-top: 40px;
             padding: 25px;
-            background-color: #fcf3cf; /* Light yellow, caution tone */
-            border-left: 6px solid #f1c40f; /* Yellow accent border */
+            background-color: #fcf3cf; 
+            border-left: 6px solid #f1c40f; 
             border-radius: 5px;
              box-shadow: 0 2px 8px rgba(0,0,0,0.07);
         }
 
         .critical-perspective h3 {
-            color: #d35400; /* Contrasting orange/brown */
-            text-align: left; /* Align heading left */
+            color: #d35400; 
+            text-align: left;
             margin-bottom: 15px;
-             border-bottom: 1px solid #fdebd0; /* Light separator */
+             border-bottom: 1px solid #fdebd0; 
              padding-bottom: 8px;
              font-size: 1.5em;
         }
@@ -182,20 +182,20 @@
         .critical-perspective p {
             margin-bottom: 15px;
             line-height: 1.7;
-            color: #505050; /* Dark grey for readability */
-             text-align: justify; /* Justify text for block feel */
+            color: #505050;
+             text-align: justify; 
         }
          .critical-perspective p:last-of-type {
-            margin-bottom: 0; /* No margin on last paragraph */
+            margin-bottom: 0;
         }
 
         .critical-perspective strong {
-            color: #c0392b; /* Highlight key numbers in red */
+            color: #c0392b; 
              font-weight: 600;
         }
-         /* --- End of Styles for NEW Sections --- */
+        
 
-         /* Minor adjustment for spacing */
+         
          .chart-container {
             margin-top: 40px; /* Ensure consistent spacing */
          }
@@ -625,21 +625,21 @@
              }
             hostelRevenue = Math.max(0, hostelRevenue);
             updateDisplayValue(totalHostelRevenueEl, hostelRevenue);
-            // --- Grand Total ---
+            
             const grandTotal = tuitionRevenue + hostelRevenue;
             updateDisplayValue(grandTotalRevenueEl, grandTotal);
-            // --- Update Grand Total in Words ---
+            
             grandTotalWordsEl.textContent = numberToWordsIndian(grandTotal);
-            // --- Calculate and Display Generous Profit Estimate ---
+            
              const generousProfit = Math.floor(grandTotal / 3);
-            // This line will now work because generousProfitValueEl is defined
+            
             updateDisplayValue(generousProfitValueEl, generousProfit);
-            // --- Update Comparison Chart ---
-            // This line will now be reached because the previous line doesn't error
+            
+            
             updateComparisonChart(grandTotal);
         }
 
-         // --- Update Comparison Chart ---
+
          function updateComparisonChart(collegeRevenue) {
              const ctx = document.getElementById('revenueComparisonChart').getContext('2d');
              const accomplishments = {
@@ -675,13 +675,13 @@
              });
          }
 
-        // --- Event Listeners ---
+        
         const allInputs = document.querySelectorAll('input[type="number"]');
         allInputs.forEach(input => {
              input.addEventListener('input', calculateAndDisplayRevenue);
         });
 
-        // --- Initial Calculation on Load ---
+        
         document.addEventListener('DOMContentLoaded', calculateAndDisplayRevenue);
 
     </script>
